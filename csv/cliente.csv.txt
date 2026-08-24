@@ -1,0 +1,6 @@
+idCliente,nombre,email
+1,Juan Pérez,juan.perez@example.com
+2,María Gómez,maria.gomez@example.com
+3,Carlos López,carlos.lopez@example.com
+4,Ana Martínez,ana.martinez@example.com
+5,Luis Rodríguez,luis.rodriguez@example.com
