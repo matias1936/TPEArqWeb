@@ -1,6 +1,0 @@
-idProducto,nombre,valor
-1,Laptop Pro 15,1200.5
-2,Mouse Inalámbrico,25.99
-3,Teclado Mecánico RGB,75.0
-4,Monitor 27 Pulgadas,300.0
-5,Auriculares Gamer,50.25
