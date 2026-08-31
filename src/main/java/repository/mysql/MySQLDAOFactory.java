@@ -3,9 +3,9 @@ import dao.ClienteDAO;
 import dao.Factura_ProductoDAO;
 import dao.FacturaDAO;
 import dao.ProductoDAO;
-import factory.AbstractFactory;
+import factory.DAOFactory;
 
-public class MySQLDAOFactory extends AbstractFactory {
+public class MySQLDAOFactory extends DAOFactory {
     @Override
 
     public ClienteDAO getClienteDAO() {
