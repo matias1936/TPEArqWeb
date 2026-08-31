@@ -1,4 +1,8 @@
 package factory;
 
-public class ConnectionManager {
-}
+public interface ConnectionManager {
+
+    Connection getConnection();
+
+    void shutdown();
+} 

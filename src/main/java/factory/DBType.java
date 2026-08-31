@@ -1,4 +1,6 @@
 package factory;
 
-public class DBType {
+public enum DBType {
+    MYSQL;
+    //DERBY;
 }
