@@ -1,33 +1,15 @@
 package dao;
 
 import entities.Factura;
+import entities.Factura_Producto;
 
-public class FacturaDAO {
-    private Condicion con;
+public interface FacturaDAO {
+    Factura findById(Long id);
 
-    public FacturaDAO(Connection conn) {
-        this.conn = conn;
-    }
-    public int insert(Factura dao) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'insert'");
-    }
+    void create(Factura f);
+    void update(Factura f);
+    void delete(Long id);
+    void deleteByFactura(Long FacturaId);
 
-
-    public boolean delete(Integer id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-
-    public Factura find(Integer pk) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'find'");
-    }
-
-
-    public boolean update(Factura dao) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
+    void deleteAll();
 }

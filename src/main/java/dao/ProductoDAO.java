@@ -2,30 +2,13 @@ package dao;
 
 import entities.Factura_Producto;
 
-    public class ProductoDAO {
-    private Connection conn;
+    public interface ProductoDAO {
+        Producto findById(Long id);
+        void create(Producto p);
+        void update(Producto p);
+        void delete(Long id);
+        void deleteByProducto(Long ProductoId);
 
-    public ProductoDAO(Connection conn) {
-        this.conn = conn;
+        void deleteAll();
     }
-
-    public int insert(Producto dao) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'insert'");
     }
-
-    public boolean delete(Integer id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    public Producto find(Integer pk) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'find'");
-    }
-
-    public boolean update(Producto dao) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-}
