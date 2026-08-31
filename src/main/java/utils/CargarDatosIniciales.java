@@ -153,11 +153,11 @@ public class CargarDatosIniciales {
                     }
                 }
 
-                System.out.println("Facturas-productos cargados correctamente.");
+                System.out.println("Productos cargados correctamente.");
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Error cargando facturas-productos desde " + resourcePath, e);
+            throw new RuntimeException("Error cargando productos desde " + resourcePath, e);
         }
     }
 
