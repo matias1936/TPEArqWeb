@@ -1,4 +1,5 @@
 package dto;
 
-public class ProductoDTO {
+public class ProductoDTO
+{
 }
