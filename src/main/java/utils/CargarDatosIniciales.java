@@ -9,6 +9,7 @@ import entities.Factura;
 import entities.Factura_Producto;
 import entities.Producto;
 import factory.DAOFactory;
+import factory.DBType;
 
 import java.io.*;
 
@@ -19,7 +20,7 @@ public class CargarDatosIniciales {
     private final ProductoDAO productoDAO;
 
     public CargarDatosIniciales() {
-        DAOFactory factory = DAOFactory.getInstance();
+        DAOFactory factory = DAOFactory.getInstance(DBType.MYSQL);
         this.clienteDAO = factory.createClienteDAO();
         this.facturaDAO = factory.createFacturaDAO();
         this.fact_prodDAO = factory.createFacturaProductoDAO();
@@ -53,7 +54,7 @@ public class CargarDatosIniciales {
                         String email = p[2].trim();
 
                         Cliente cliente = new Cliente(idCliente, nombre, email);
-                        this.clienteDAO.insert(cliente);
+                        this.clienteDAO.create(cliente);
                     }
                 }
 
@@ -85,7 +86,7 @@ public class CargarDatosIniciales {
                         Integer idCliente = Integer.parseInt(p[1].trim());
 
                         Factura factura = new Factura(idFactura, idCliente);
-                        this.facturaDAO.insert(factura);
+                        this.facturaDAO.create(factura);
                     }
                 }
 
@@ -117,7 +118,7 @@ public class CargarDatosIniciales {
                         Integer cantidad =  Integer.parseInt(p[2].trim());
 
                         Factura_Producto fp = new Factura_Producto(idFactura, idProducto, cantidad);
-                        this.factura_ProductoDAO.insert(fp);
+                        this.fact_prodDAO.create(fp);
                     }
                 }
 
@@ -149,7 +150,7 @@ public class CargarDatosIniciales {
                         Float valor =  Float.parseFloat(p[2].trim());
 
                         Producto producto = new Producto(idProducto, nombre, valor);
-                        this.productoDAO.insert(producto);
+                        this.productoDAO.create(producto);
                     }
                 }
 
