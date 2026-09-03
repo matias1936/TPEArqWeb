@@ -1,13 +1,15 @@
 package factory;
-
+import java.sql.Connection;
+import dao.ClienteDAO;
 import dao.FacturaDAO;
 import dao.ProductoDAO;
-
+import dao.Factura_ProductoDAO;
+import repository.mysql.MySQLDAOFactory;
 public abstract class DAOFactory {
 
     private static volatile DAOFactory instance;
  
-    publis static DAOFactory getInstance(DBType type){
+    public static DAOFactory getInstance(DBType type){
         if (instance == null) {
             synchronized (DAOFactory.class){
                 if(instance == null){

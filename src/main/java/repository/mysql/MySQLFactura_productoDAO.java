@@ -1,10 +1,12 @@
 package repository.mysql;
+
+import dao.Factura_ProductoDAO;
+import entities.Factura_Producto;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
-import dao.Factura_Producto;
-import entities.Factura_Producto;
+import java.sql.SQLException;
 
 public class MySQLFactura_productoDAO implements Factura_ProductoDAO {
      private Connection conn;
@@ -16,82 +18,163 @@ public class MySQLFactura_productoDAO implements Factura_ProductoDAO {
     }
 
     @Override
-    public int insert(Factura_Producto facturaProducto) throws Exception {
+
+    public void create(Factura_Producto facturaProducto) {
+
         String sql = "INSERT INTO factura_producto " +
+
                      "(idFactura, idProducto, cantidad) " +
+
                      "VALUES (?, ?, ?)";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, facturaProducto.getIdFactura());
-        ps.setInt(2, facturaProducto.getIdProducto());
-        ps.setInt(3, facturaProducto.getCantidad());
-        int resultado = ps.executeUpdate();
-        ps.close();
-        return resultado;
-    }
-    @Override
-    public boolean delete(Integer idFactura, Integer idProducto) {
-        String sql = "DELETE FROM factura_producto " +
-                     "WHERE idFactura = ? AND idProducto = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, idFactura);
-            ps.setInt(2, idProducto);
-            int resultado = ps.executeUpdate();
-            ps.close();
-            return resultado > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, facturaProducto.getIdFactura());
+
+            ps.setInt(2, facturaProducto.getIdProducto());
+
+            ps.setInt(3, facturaProducto.getCantidad());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error creando factura_producto", e);
+
         }
+
     }
+
     @Override
-    public Factura_Producto find(Integer idFactura, Integer idProducto) {
+
+    public Factura_Producto findById(Long idFactura, Long idProducto) {
+
         String sql = "SELECT idFactura, idProducto, cantidad " +
+
                      "FROM factura_producto " +
+
                      "WHERE idFactura = ? AND idProducto = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, idFactura);
-            ps.setInt(2, idProducto);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Factura_Producto facturaProducto = new Factura_Producto();
-                facturaProducto.setIdFactura(
-                        rs.getInt("idFactura")
-                );
-                facturaProducto.setIdProducto(
-                        rs.getInt("idProducto")
-                );
-                facturaProducto.setCantidad(
-                    rs.getInt("cantidad")
-                );
-                rs.close();
-                ps.close();
-              return facturaProducto;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, idFactura);
+
+            ps.setLong(2, idProducto);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    return new Factura_Producto(
+
+                            rs.getInt("idFactura"),
+
+                            rs.getInt("idProducto"),
+
+                            rs.getInt("cantidad")
+
+                    );
+
+                }
+
             }
-            rs.close();
-            ps.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error buscando factura_producto", e);
+
         }
+
         return null;
+
     }
+
     @Override
-    public boolean update(Factura_Producto facturaProducto) {
+
+    public void update(Factura_Producto facturaProducto) {
+
         String sql = "UPDATE factura_producto " +
+
                      "SET cantidad = ? " +
-                  "WHERE idFactura = ? AND idProducto = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
+
+                     "WHERE idFactura = ? AND idProducto = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, facturaProducto.getCantidad());
+
             ps.setInt(2, facturaProducto.getIdFactura());
+
             ps.setInt(3, facturaProducto.getIdProducto());
-            int resultado = ps.executeUpdate();
-            ps.close();
-            return resultado > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error actualizando factura_producto", e);
+
+        }
+
+    }
+
+    @Override
+
+    public void delete(Long idFactura, Long idProducto) {
+
+        String sql = "DELETE FROM factura_producto " +
+
+                     "WHERE idFactura = ? AND idProducto = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, idFactura);
+
+            ps.setLong(2, idProducto);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error eliminando factura_producto", e);
+
+        }
+
+    }
+
+    @Override
+
+    public void deleteByFactura(Long facturaId) {
+
+        String sql = "DELETE FROM factura_producto WHERE idFactura = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, facturaId);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error eliminando productos de la factura", e);
+
+        }
+
+    }
+
+    @Override
+
+    public void deleteAll() {
+
+        String sql = "DELETE FROM factura_producto";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error eliminando todos los factura_producto", e);
+
         }
 
     }

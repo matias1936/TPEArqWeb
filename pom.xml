@@ -88,14 +88,21 @@
       </plugins>
     </pluginManagement>
       <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                  <source>11</source>
-                  <target>11</target>
-              </configuration>
-          </plugin>
+         <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <source>11</source>
+        <target>11</target>
+        <annotationProcessorPaths>
+            <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.46</version>
+            </path>
+        </annotationProcessorPaths>
+    </configuration>
+</plugin>
       </plugins>
   </build>
 </project>

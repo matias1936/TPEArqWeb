@@ -5,8 +5,9 @@ import entities.Cliente;
 import java.util.List;
 
 public interface ClienteDAO {
-    Cliente findById(Long id);
+   
     List<Cliente> findAll();
+    Cliente findById(Long id);
     List<Cliente> findByCliente(Long clienteId);
 
     void create(Cliente c);
