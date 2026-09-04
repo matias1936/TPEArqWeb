@@ -2,19 +2,35 @@ package repository.mysql;
 
 import dao.Factura_ProductoDAO;
 import entities.Factura_Producto;
-
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLFactura_productoDAO implements Factura_ProductoDAO {
-     private Connection conn;
+    private Connection conn;
 
     public MySQLFactura_productoDAO(Connection conn) {
-
         this.conn = conn;
+        crearTablaSiNoExiste();
+    }
 
+    private void crearTablaSiNoExiste() {
+        final String sql = "CREATE TABLE IF NOT EXISTS factura_producto (" +
+                "idFactura INT NOT NULL," +
+                "idProducto INT NOT NULL," +
+                "cantidad INT NOT NULL," +
+                "PRIMARY KEY (idFactura, idProducto)," +
+                "FOREIGN KEY (idFactura) REFERENCES factura(idFactura)," +
+                "FOREIGN KEY (idProducto) REFERENCES producto(idProducto)" +
+                ")";
+
+        try (Statement st = conn.createStatement()) {
+            st.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creando tabla 'factura_producto'", e);
+        }
     }
 
     @Override
@@ -23,9 +39,9 @@ public class MySQLFactura_productoDAO implements Factura_ProductoDAO {
 
         String sql = "INSERT INTO factura_producto " +
 
-                     "(idFactura, idProducto, cantidad) " +
+                "(idFactura, idProducto, cantidad) " +
 
-                     "VALUES (?, ?, ?)";
+                "VALUES (?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -51,9 +67,9 @@ public class MySQLFactura_productoDAO implements Factura_ProductoDAO {
 
         String sql = "SELECT idFactura, idProducto, cantidad " +
 
-                     "FROM factura_producto " +
+                "FROM factura_producto " +
 
-                     "WHERE idFactura = ? AND idProducto = ?";
+                "WHERE idFactura = ? AND idProducto = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -95,9 +111,9 @@ public class MySQLFactura_productoDAO implements Factura_ProductoDAO {
 
         String sql = "UPDATE factura_producto " +
 
-                     "SET cantidad = ? " +
+                "SET cantidad = ? " +
 
-                     "WHERE idFactura = ? AND idProducto = ?";
+                "WHERE idFactura = ? AND idProducto = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -123,7 +139,7 @@ public class MySQLFactura_productoDAO implements Factura_ProductoDAO {
 
         String sql = "DELETE FROM factura_producto " +
 
-                     "WHERE idFactura = ? AND idProducto = ?";
+                "WHERE idFactura = ? AND idProducto = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 

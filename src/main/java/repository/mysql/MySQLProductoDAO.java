@@ -1,16 +1,33 @@
 package repository.mysql;
 
+import java.sql.Statement;
 import dao.ProductoDAO;
 import entities.Producto;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MySQLProductoDAO implements ProductoDAO {
     private Connection conn;
 
     public MySQLProductoDAO(Connection conn) {
         this.conn = conn;
+        crearTablaSiNoExiste();
+    }
+
+    private void crearTablaSiNoExiste() {
+        final String sql = "CREATE TABLE IF NOT EXISTS producto (" +
+                "idProducto INT PRIMARY KEY," +
+                "nombre VARCHAR(100) NOT NULL," +
+                "valor FLOAT NOT NULL" +
+                ")";
+
+        try (Statement st = conn.createStatement()) {
+            st.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creando tabla 'producto'", e);
+        }
     }
 
     @Override

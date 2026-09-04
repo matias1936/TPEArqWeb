@@ -17,9 +17,9 @@ public class Main {
         System.out.println();
 
         ClienteDAO cliente = factory.createClienteDAO();
-        Factura_ProductoDAO factura_producto = factory.createFacturaProductoDAO();
-        FacturaDAO factura = factory.createFacturaDAO();
         ProductoDAO producto = factory.createProductoDAO();
+        FacturaDAO factura = factory.createFacturaDAO();
+        Factura_ProductoDAO factura_producto = factory.createFacturaProductoDAO();
 
         System.out.println("Busco un cliente por id: ");
         Cliente clienteById = cliente.findById(2L);

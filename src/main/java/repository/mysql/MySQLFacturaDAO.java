@@ -1,26 +1,42 @@
 package repository.mysql;
+
 import dao.FacturaDAO;
 import entities.Factura;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
-public class MySQLFacturaDAO implements FacturaDAO{
-     private Connection conn;
+public class MySQLFacturaDAO implements FacturaDAO {
+    private Connection conn;
 
     public MySQLFacturaDAO(Connection conn) {
-
         this.conn = conn;
-
+        crearTablaSiNoExiste();
     }
-   @Override
+
+    private void crearTablaSiNoExiste() {
+        final String sql = "CREATE TABLE IF NOT EXISTS factura (" +
+                "idFactura INT PRIMARY KEY," +
+                "idCliente INT NOT NULL," +
+                "FOREIGN KEY (idCliente) REFERENCES cliente(idCliente)" +
+                ")";
+
+        try (Statement st = conn.createStatement()) {
+            st.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creando tabla 'factura'", e);
+        }
+    }
+
+    @Override
 
     public void create(Factura factura) {
 
         String sql = "INSERT INTO factura (idFactura, idCliente) " +
 
-                     "VALUES (?, ?)";
+                "VALUES (?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -44,7 +60,7 @@ public class MySQLFacturaDAO implements FacturaDAO{
 
         String sql = "SELECT idFactura, idCliente " +
 
-                     "FROM factura WHERE idFactura = ?";
+                "FROM factura WHERE idFactura = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -82,9 +98,9 @@ public class MySQLFacturaDAO implements FacturaDAO{
 
         String sql = "UPDATE factura " +
 
-                     "SET idCliente = ? " +
+                "SET idCliente = ? " +
 
-                     "WHERE idFactura = ?";
+                "WHERE idFactura = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
