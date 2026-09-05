@@ -216,4 +216,39 @@ public class MySQLClienteDAO implements ClienteDAO {
         return clientes;
 
     }
+
+    @Override
+    public List<Cliente> findClientesOrdenadosPorFacturacion() {
+
+        String sql = "SELECT c.idCliente, c.nombre, c.email " +
+                "FROM cliente c " +
+                "JOIN factura f ON c.idCliente = f.idCliente " +
+                "JOIN factura_producto fp ON f.idFactura = fp.idFactura " +
+                "JOIN producto p ON fp.idProducto = p.idProducto " +
+                "GROUP BY c.idCliente, c.nombre, c.email " +
+                "ORDER BY SUM(fp.cantidad * p.valor) DESC";
+
+        List<Cliente> clientes = new ArrayList<>();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                Cliente cliente = new Cliente();
+
+                cliente.setIdCliente(rs.getInt("idCliente"));
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setEmail(rs.getString("email"));
+
+                clientes.add(cliente);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Error buscando clientes ordenados por facturación", e);
+        }
+
+        return clientes;
+    }
 }

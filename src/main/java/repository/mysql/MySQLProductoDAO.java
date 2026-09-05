@@ -31,73 +31,167 @@ public class MySQLProductoDAO implements ProductoDAO {
     }
 
     @Override
-    public int insert(Producto producto) throws Exception {
+
+    public void create(Producto producto) {
+
         String sql = "INSERT INTO producto (idProducto, nombre, valor) VALUES (?, ?, ?)";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, producto.getIdProducto());
-        ps.setString(2, producto.getNombre());
-        ps.setFloat(3, producto.getValor());
-        int resultado = ps.executeUpdate();
-        ps.close();
-        return resultado;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, producto.getIdProducto());
+
+            ps.setString(2, producto.getNombre());
+
+            ps.setFloat(3, producto.getValor());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error creando producto", e);
+
+        }
+
     }
 
     @Override
-    public boolean delete(Integer id) {
+
+    public void delete(Long id) {
+
         String sql = "DELETE FROM producto WHERE idProducto = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, id);
-            int resultado = ps.executeUpdate();
-            ps.close();
-            return resultado > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, id);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error eliminando producto", e);
+
         }
+
     }
 
     @Override
-    public Producto find(Integer id) {
+
+    public Producto findById(Long id) {
+
         String sql = "SELECT idProducto, nombre, valor " +
+
                 "FROM producto WHERE idProducto = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Producto producto = new Producto();
-                producto.setIdProducto(rs.getInt("idProducto"));
-                producto.setNombre(rs.getString("nombre"));
-                producto.setValor(rs.getFloat("valor"));
-                rs.close();
-                ps.close();
-                return producto;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    Producto producto = new Producto(
+
+                            rs.getInt("idProducto"),
+
+                            rs.getString("nombre"),
+
+                            rs.getFloat("valor"));
+
+                    return producto;
+
+                }
+
             }
-            rs.close();
-            ps.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error buscando producto", e);
+
         }
+
         return null;
+
     }
 
     @Override
-    public boolean update(Producto producto) {
+
+    public void update(Producto producto) {
+
         String sql = "UPDATE producto " +
+
                 "SET nombre = ?, valor = ? " +
+
                 "WHERE idProducto = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, producto.getNombre());
+
             ps.setFloat(2, producto.getValor());
-            ps.setInt(3, producto.getIdProducto());
-            int resultado = ps.executeUpdate();
-            ps.close();
-            return resultado > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+
+            ps.setLong(3, producto.getIdProducto());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error actualizando producto", e);
+
         }
+
+    }
+
+    @Override
+
+    public void deleteByProducto(Long productoId) {
+
+        delete(productoId);
+
+    }
+
+    @Override
+
+    public void deleteAll() {
+
+        String sql = "DELETE FROM producto";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException("Error eliminando todos los productos", e);
+
+        }
+
+    }
+
+    @Override
+    public Producto findProductoMayorRecaudacion() {
+        String sql = "SELECT p.idProducto, p.nombre, p.valor " +
+                "FROM producto p " +
+                "JOIN factura_producto fp ON p.idProducto = fp.idProducto " +
+                "GROUP BY p.idProducto, p.nombre, p.valor " +
+                "ORDER BY SUM(fp.cantidad * p.valor) DESC " +
+                "LIMIT 1";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return new Producto(
+                        rs.getInt("idProducto"),
+                        rs.getString("nombre"),
+                        rs.getFloat("valor"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Error buscando el producto con mayor recaudación", e);
+        }
+
+        return null;
     }
 }
