@@ -12,6 +12,11 @@ import factory.DAOFactory;
 import factory.DBType;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 public class CargarDatosIniciales {
     private final ClienteDAO clienteDAO;
@@ -22,148 +27,135 @@ public class CargarDatosIniciales {
     public CargarDatosIniciales() {
         DAOFactory factory = DAOFactory.getInstance(DBType.MYSQL);
         this.clienteDAO = factory.createClienteDAO();
+        this.productoDAO = factory.createProductoDAO();
         this.facturaDAO = factory.createFacturaDAO();
         this.fact_prodDAO = factory.createFacturaProductoDAO();
-        this.productoDAO = factory.createProductoDAO();
     }
 
-    public void run (){
-        this.cargarClientes("/resources/clientes.csv");
-        this.cargarFacturas("/resources/facturas.csv");
-        this.cargarFacturasProductos("/resources/facturas-productos.csv");
-        this.cargarProductos("/resources/productos.csv");
+    public void run() {
+        this.cargarClientes("/clientes.csv");
+        this.cargarProductos("/productos.csv");
+        this.cargarFacturas("/facturas.csv");
+        this.cargarFacturasProductos("/facturas-productos.csv");
     }
 
-    private void cargarClientes(String resourcePath){
-        try {
-            try (
-                    InputStream is = this.mustGetResource(resourcePath);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            ) {
-                boolean first = true;
+    private void cargarClientes(String resourcePath) {
+        try (InputStream is = this.mustGetResource(resourcePath);
+                CSVParser parser = CSVParser.parse(
+                        is,
+                        StandardCharsets.UTF_8,
+                        CSVFormat.DEFAULT.builder()
+                                .setHeader()
+                                .setSkipHeaderRecord(true)
+                                .get())) {
 
-                String line;
-                while((line = br.readLine()) != null) {
-                    if (first) {
-                        first = false;
-                    } else if (!line.isBlank()) {
-                        String[] p = line.split(",", -1);
+            for (CSVRecord record : parser) {
 
-                        Integer idCliente = Integer.parseInt(p[0].trim());
-                        String nombre = p[1].trim();
-                        String email = p[2].trim();
+                Integer idCliente = Integer.parseInt(record.get("idCliente").trim());
+                String nombre = record.get("nombre").trim();
+                String email = record.get("email").trim();
 
-                        Cliente cliente = new Cliente(idCliente, nombre, email);
-                        this.clienteDAO.create(cliente);
-                    }
-                }
+                Cliente cliente = new Cliente(idCliente, nombre, email);
 
-                System.out.println("Cliente cargados correctamente.");
+                this.clienteDAO.create(cliente);
             }
 
+            System.out.println("Clientes cargados correctamente.");
+
         } catch (Exception e) {
-            throw new RuntimeException("Error cargando clientes desde " + resourcePath, e);
+            throw new RuntimeException(
+                    "Error cargando clientes desde " + resourcePath, e);
         }
     }
 
+    private void cargarFacturas(String resourcePath) {
+        try (InputStream is = this.mustGetResource(resourcePath);
+                CSVParser parser = CSVParser.parse(
+                        is,
+                        StandardCharsets.UTF_8,
+                        CSVFormat.DEFAULT.builder()
+                                .setHeader()
+                                .setSkipHeaderRecord(true)
+                                .get())) {
 
-    private void cargarFacturas(String resourcePath){
-        try {
-            try (
-                    InputStream is = this.mustGetResource(resourcePath);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            ) {
-                boolean first = true;
+            for (CSVRecord record : parser) {
 
-                String line;
-                while((line = br.readLine()) != null) {
-                    if (first) {
-                        first = false;
-                    } else if (!line.isBlank()) {
-                        String[] p = line.split(",", -1);
+                Integer idFactura = Integer.parseInt(record.get("idFactura").trim());
+                Integer idCliente = Integer.parseInt(record.get("idCliente").trim());
 
-                        Integer idFactura = Integer.parseInt(p[0].trim());
-                        Integer idCliente = Integer.parseInt(p[1].trim());
+                Factura factura = new Factura(idFactura, idCliente);
 
-                        Factura factura = new Factura(idFactura, idCliente);
-                        this.facturaDAO.create(factura);
-                    }
-                }
-
-                System.out.println("Facturas cargadas correctamente.");
+                this.facturaDAO.create(factura);
             }
 
+            System.out.println("Facturas cargadas correctamente.");
+
         } catch (Exception e) {
-            throw new RuntimeException("Error cargando facturas desde " + resourcePath, e);
+            throw new RuntimeException(
+                    "Error cargando facturas desde " + resourcePath, e);
         }
     }
 
-    private void cargarFacturasProductos(String resourcePath){
-        try {
-            try (
-                    InputStream is = this.mustGetResource(resourcePath);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            ) {
-                boolean first = true;
+    private void cargarFacturasProductos(String resourcePath) {
+        try (InputStream is = this.mustGetResource(resourcePath);
+                CSVParser parser = CSVParser.parse(
+                        is,
+                        StandardCharsets.UTF_8,
+                        CSVFormat.DEFAULT.builder()
+                                .setHeader()
+                                .setSkipHeaderRecord(true)
+                                .get())) {
 
-                String line;
-                while((line = br.readLine()) != null) {
-                    if (first) {
-                        first = false;
-                    } else if (!line.isBlank()) {
-                        String[] p = line.split(",", -1);
+            for (CSVRecord record : parser) {
 
-                        Integer idFactura = Integer.parseInt(p[0].trim());
-                        Integer idProducto = Integer.parseInt(p[1].trim());
-                        Integer cantidad =  Integer.parseInt(p[2].trim());
+                Integer idFactura = Integer.parseInt(record.get("idFactura").trim());
+                Integer idProducto = Integer.parseInt(record.get("idProducto").trim());
+                Integer cantidad = Integer.parseInt(record.get("cantidad").trim());
 
-                        Factura_Producto fp = new Factura_Producto(idFactura, idProducto, cantidad);
-                        this.fact_prodDAO.create(fp);
-                    }
-                }
+                Factura_Producto fp = new Factura_Producto(
+                        idFactura,
+                        idProducto,
+                        cantidad);
 
-                System.out.println("Facturas-productos cargados correctamente.");
+                this.fact_prodDAO.create(fp);
             }
 
+            System.out.println("Facturas-productos cargados correctamente.");
+
         } catch (Exception e) {
-            throw new RuntimeException("Error cargando facturas-productos desde " + resourcePath, e);
+            throw new RuntimeException(
+                    "Error cargando facturas-productos desde " + resourcePath, e);
         }
     }
 
-    private void cargarProductos(String resourcePath){
-        try {
-            try (
-                    InputStream is = this.mustGetResource(resourcePath);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            ) {
-                boolean first = true;
+    private void cargarProductos(String resourcePath) {
+        try (InputStream is = this.mustGetResource(resourcePath);
+                CSVParser parser = CSVParser.parse(
+                        is,
+                        StandardCharsets.UTF_8,
+                        CSVFormat.DEFAULT.builder()
+                                .setHeader()
+                                .setSkipHeaderRecord(true)
+                                .get())) {
 
-                String line;
-                while((line = br.readLine()) != null) {
-                    if (first) {
-                        first = false;
-                    } else if (!line.isBlank()) {
-                        String[] p = line.split(",", -1);
+            for (CSVRecord record : parser) {
 
-                        Integer idProducto = Integer.parseInt(p[0].trim());
-                        String nombre = p[1].trim();
-                        Float valor =  Float.parseFloat(p[2].trim());
+                Integer idProducto = Integer.parseInt(record.get("idProducto").trim());
+                String nombre = record.get("nombre").trim();
+                Float valor = Float.parseFloat(record.get("valor").trim());
 
-                        Producto producto = new Producto(idProducto, nombre, valor);
-                        this.productoDAO.create(producto);
-                    }
-                }
+                Producto producto = new Producto(idProducto, nombre, valor);
 
-                System.out.println("Productos cargados correctamente.");
+                this.productoDAO.create(producto);
             }
 
+            System.out.println("Productos cargados correctamente.");
+
         } catch (Exception e) {
-            throw new RuntimeException("Error cargando productos desde " + resourcePath, e);
+            throw new RuntimeException(
+                    "Error cargando productos desde " + resourcePath, e);
         }
     }
-
-
-
 
     private InputStream mustGetResource(String path) {
         InputStream is = this.getClass().getResourceAsStream(path);
@@ -174,8 +166,3 @@ public class CargarDatosIniciales {
         }
     }
 }
-
-
-
-
-
