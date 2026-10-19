@@ -1,3 +1,7 @@
+Links a los otros trabajos:
+TP2: https://github.com/matias1936/ArqWeb2
+TP3: https://github.com/mailenramos/TP3
+
 # TPEArqWeb
 
 Aplicación Java que gestiona clientes, productos y facturas, implementada con el patrón **DAO + Abstract Factory** para desacoplar la lógica de negocio del motor de base de datos.
